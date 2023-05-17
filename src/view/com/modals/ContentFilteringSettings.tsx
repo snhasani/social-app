@@ -13,6 +13,7 @@ import {usePalette} from 'lib/hooks/usePalette'
 import {CONFIGURABLE_LABEL_GROUPS} from 'lib/labeling/const'
 import {isDesktopWeb, isIOS} from 'platform/detection'
 import * as Toast from '../util/Toast'
+import {ButtonGroup} from '../util/ButtonGroup'
 
 export const snapPoints = ['90%']
 
@@ -134,6 +135,9 @@ const ContentLabelPref = observer(
       [store, group],
     )
 
+    const getAccessibilityHint = (value: string) =>
+      `Set ${value} for ${group} content moderation policy`
+
     return (
       <View style={[styles.contentLabelPref, pal.border]}>
         <View style={s.flex1}>
@@ -151,93 +155,35 @@ const ContentLabelPref = observer(
             Hide
           </Text>
         ) : (
-          <SelectGroup
-            current={store.preferences.contentLabels[group]}
+          <ButtonGroup
+            selected={store.preferences.contentLabels[group]}
             onChange={onChange}
-            group={group}
+            items={[
+              {
+                accessibilityLabel: 'hide',
+                accessibilityHint: getAccessibilityHint('hide'),
+                label: 'Hide',
+                value: 'hide',
+              },
+              {
+                accessibilityLabel: 'warn',
+                accessibilityHint: getAccessibilityHint('warn'),
+                label: 'Warn',
+                value: 'warn',
+              },
+              {
+                accessibilityLabel: 'show',
+                accessibilityHint: getAccessibilityHint('show'),
+                label: 'Show',
+                value: 'show',
+              },
+            ]}
           />
         )}
       </View>
     )
   },
 )
-
-interface SelectGroupProps {
-  current: LabelPreference
-  onChange: (v: LabelPreference) => void
-  group: keyof typeof CONFIGURABLE_LABEL_GROUPS
-}
-
-function SelectGroup({current, onChange, group}: SelectGroupProps) {
-  return (
-    <View style={styles.selectableBtns}>
-      <SelectableBtn
-        current={current}
-        value="hide"
-        label="Hide"
-        left
-        onChange={onChange}
-        group={group}
-      />
-      <SelectableBtn
-        current={current}
-        value="warn"
-        label="Warn"
-        onChange={onChange}
-        group={group}
-      />
-      <SelectableBtn
-        current={current}
-        value="show"
-        label="Show"
-        right
-        onChange={onChange}
-        group={group}
-      />
-    </View>
-  )
-}
-
-interface SelectableBtnProps {
-  current: string
-  value: LabelPreference
-  label: string
-  left?: boolean
-  right?: boolean
-  onChange: (v: LabelPreference) => void
-  group: keyof typeof CONFIGURABLE_LABEL_GROUPS
-}
-
-function SelectableBtn({
-  current,
-  value,
-  label,
-  left,
-  right,
-  onChange,
-  group,
-}: SelectableBtnProps) {
-  const pal = usePalette('default')
-  const palPrimary = usePalette('inverted')
-  return (
-    <Pressable
-      style={[
-        styles.selectableBtn,
-        left && styles.selectableBtnLeft,
-        right && styles.selectableBtnRight,
-        pal.border,
-        current === value ? palPrimary.view : pal.view,
-      ]}
-      onPress={() => onChange(value)}
-      accessibilityRole="button"
-      accessibilityLabel={value}
-      accessibilityHint={`Set ${value} for ${group} content moderation policy`}>
-      <Text style={current === value ? palPrimary.text : pal.text}>
-        {label}
-      </Text>
-    </Pressable>
-  )
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -275,28 +221,6 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
     marginBottom: 14,
     borderTopWidth: 1,
-  },
-
-  selectableBtns: {
-    flexDirection: 'row',
-    marginLeft: 10,
-  },
-  selectableBtn: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-  },
-  selectableBtnLeft: {
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
-    borderLeftWidth: 1,
-  },
-  selectableBtnRight: {
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
   },
 
   btn: {
