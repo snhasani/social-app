@@ -1,3 +1,4 @@
+import {Appearance, ColorSchemeName} from 'react-native'
 import {AppBskyEmbedRecord} from '@atproto/api'
 import {RootStoreModel} from '../root-store'
 import {makeAutoObservable} from 'mobx'
@@ -7,6 +8,7 @@ import {Image as RNImage} from 'react-native-image-crop-picker'
 import {ImageModel} from '../media/image'
 import {ListModel} from '../content/list'
 import {GalleryModel} from '../media/gallery'
+import {ObjectValues} from 'lib/type-assertions'
 
 export interface ConfirmModal {
   name: 'confirm'
@@ -188,8 +190,17 @@ export interface ComposerOpts {
   quote?: ComposerOptsQuote
 }
 
+export const APPEARANCE_MODE = {
+  AUTO: 'auto',
+  DARK: 'dark',
+  LIGHT: 'light',
+} as const
+
+export type AppearanceMode = ObjectValues<typeof APPEARANCE_MODE>
+
 export class ShellUiModel {
-  darkMode = false
+  colorScheme: ColorSchemeName = Appearance.getColorScheme()
+  appearanceMode: AppearanceMode = 'auto'
   minimalShellMode = false
   isDrawerOpen = false
   isDrawerSwipeDisabled = false
@@ -208,22 +219,32 @@ export class ShellUiModel {
     })
   }
 
-  serialize(): unknown {
+  serialize(): {appearanceMode: AppearanceMode} {
     return {
-      darkMode: this.darkMode,
+      appearanceMode: this.appearanceMode,
     }
   }
 
   hydrate(v: unknown) {
     if (isObj(v)) {
-      if (hasProp(v, 'darkMode') && typeof v.darkMode === 'boolean') {
-        this.darkMode = v.darkMode
+      if (
+        // TODO: this is just in case for removing darkMode
+        // darkMode is deprecated. Old versions using this still have it in their localStorage
+        (v != null && hasProp(v, 'appearanceMode')) ||
+        hasProp(v, 'darkMode')
+      ) {
+        this.setAppearanceMode(v.appearanceMode as AppearanceMode)
       }
     }
   }
 
-  setDarkMode(v: boolean) {
-    this.darkMode = v
+  setAppearanceMode(v: AppearanceMode) {
+    this.appearanceMode = v
+    this.setColorScheme(v === 'auto' ? Appearance.getColorScheme() : v)
+  }
+
+  setColorScheme(v: ColorSchemeName) {
+    this.colorScheme = v
   }
 
   setMinimalShellMode(v: boolean) {

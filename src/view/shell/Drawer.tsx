@@ -26,7 +26,6 @@ import {
   CogIcon,
   MagnifyingGlassIcon2,
   MagnifyingGlassIcon2Solid,
-  MoonIcon,
   UserIconSolid,
   HandIcon,
 } from 'lib/icons'
@@ -41,6 +40,7 @@ import {NavigationProp} from 'lib/routes/types'
 import {useNavigationTabState} from 'lib/hooks/useNavigationTabState'
 import {isWeb} from 'platform/detection'
 import {formatCount} from 'view/com/util/numeric/format'
+import {AppearanceToggle} from 'view/com/util/AppearanceToggle'
 
 export const DrawerContent = observer(() => {
   const theme = useTheme()
@@ -111,11 +111,6 @@ export const DrawerContent = observer(() => {
     track('Menu:FeedbackClicked')
     Linking.openURL(FEEDBACK_FORM_URL)
   }, [track])
-
-  const onDarkmodePress = React.useCallback(() => {
-    track('Menu:ItemClicked', {url: '#darkmode'})
-    store.shell.setDarkMode(!store.shell.darkMode)
-  }, [track, store])
 
   // rendering
   // =
@@ -277,29 +272,7 @@ export const DrawerContent = observer(() => {
         </View>
         <View style={s.flex1} />
         <View style={styles.footer}>
-          {!isWeb && (
-            <TouchableOpacity
-              accessibilityRole="button"
-              accessibilityLabel="Toggle dark mode"
-              accessibilityHint={
-                theme.colorScheme === 'dark'
-                  ? 'Sets display to light mode'
-                  : 'Sets display to dark mode'
-              }
-              onPress={onDarkmodePress}
-              style={[
-                styles.footerBtn,
-                theme.colorScheme === 'light'
-                  ? pal.btn
-                  : styles.footerBtnDarkMode,
-              ]}>
-              <MoonIcon
-                size={22}
-                style={pal.text as StyleProp<ViewStyle>}
-                strokeWidth={2}
-              />
-            </TouchableOpacity>
-          )}
+          <AppearanceToggle />
           <TouchableOpacity
             accessibilityRole="link"
             accessibilityLabel="Send feedback"
@@ -494,11 +467,11 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
     paddingRight: 30,
     paddingTop: 20,
     paddingLeft: 20,
+    gap: 15,
   },
   footerBtn: {
     flexDirection: 'row',

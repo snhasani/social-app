@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import {observer} from 'mobx-react-lite'
 import 'lib/sentry' // must be relatively on top
 import {SafeAreaProvider} from 'react-native-safe-area-context'
 import {RootSiblingParent} from 'react-native-root-siblings'
@@ -8,12 +9,13 @@ import {RootStoreModel, setupState, RootStoreProvider} from './state'
 import {Shell} from './view/shell/index'
 import {ToastContainer} from './view/com/util/Toast.web'
 import {ThemeProvider} from 'lib/ThemeContext'
-import {observer} from 'mobx-react-lite'
+import {useAppearanceChangeListener} from 'lib/hooks/useAppearanceChangeListener'
 
 const App = observer(() => {
   const [rootStore, setRootStore] = useState<RootStoreModel | undefined>(
     undefined,
   )
+  useAppearanceChangeListener(rootStore?.shell)
 
   // init
   useEffect(() => {
@@ -30,7 +32,7 @@ const App = observer(() => {
   }
 
   return (
-    <ThemeProvider theme={rootStore.shell.darkMode ? 'dark' : 'light'}>
+    <ThemeProvider theme={rootStore.shell.colorScheme}>
       <RootSiblingParent>
         <analytics.Provider>
           <RootStoreProvider value={rootStore}>
