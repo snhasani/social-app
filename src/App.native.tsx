@@ -14,6 +14,7 @@ import {RootStoreModel, setupState, RootStoreProvider} from './state'
 import {Shell} from './view/shell'
 import * as notifee from 'lib/notifee'
 import * as analytics from 'lib/analytics'
+import {useAppearanceChangeListener} from 'lib/hooks/useAppearanceChangeListener'
 import * as Toast from './view/com/util/Toast'
 import {handleLink} from './Navigation'
 
@@ -23,6 +24,7 @@ const App = observer(() => {
   const [rootStore, setRootStore] = useState<RootStoreModel | undefined>(
     undefined,
   )
+  useAppearanceChangeListener(rootStore?.shell)
 
   // init
   useEffect(() => {
@@ -51,7 +53,7 @@ const App = observer(() => {
     return null
   }
   return (
-    <ThemeProvider theme={rootStore.shell.darkMode ? 'dark' : 'light'}>
+    <ThemeProvider theme={rootStore.shell.colorScheme}>
       <RootSiblingParent>
         <analytics.Provider>
           <RootStoreProvider value={rootStore}>

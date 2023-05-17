@@ -1,8 +1,11 @@
 import React, {createContext, useContext, useMemo} from 'react'
-import {TextStyle, useColorScheme, ViewStyle} from 'react-native'
+import {
+  ColorSchemeName,
+  TextStyle,
+  ViewStyle,
+  useColorScheme,
+} from 'react-native'
 import {darkTheme, defaultTheme} from './themes'
-
-export type ColorScheme = 'light' | 'dark'
 
 export type PaletteColorName =
   | 'default'
@@ -71,14 +74,14 @@ export type TypographyVariant =
 export type Typography = Record<TypographyVariant, TextStyle>
 
 export interface Theme {
-  colorScheme: ColorScheme
+  colorScheme: ColorSchemeName
   palette: Palette
   shapes: Shapes
   typography: Typography
 }
 
 export interface ThemeProviderProps {
-  theme?: ColorScheme
+  theme?: ColorSchemeName
 }
 
 export const ThemeContext = createContext<Theme>(defaultTheme)
